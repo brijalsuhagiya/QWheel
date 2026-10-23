@@ -1,0 +1,57 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, maximum-scale=1" />
+  <meta name="theme-color" content="#000000" />
+  <meta name="description" content="QuickWheel — last-mile, sorted. A hub-to-destination ride-booking prototype." />
+  <title>QuickWheel</title>
+
+  <link rel="icon" href="favicon.svg" type="image/svg+xml" />
+  <link rel="apple-touch-icon" href="favicon.svg" />
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+
+  <link rel="stylesheet" href="css/reset.css" />
+  <link rel="stylesheet" href="css/variables.css" />
+  <link rel="stylesheet" href="css/base.css" />
+  <link rel="stylesheet" href="css/components.css" />
+  <link rel="stylesheet" href="css/screens.css" />
+  <link rel="stylesheet" href="css/animations.css" />
+</head>
+<body>
+  <!-- Centering stage. On wide windows this holds the phone frame; below ~520px it collapses. -->
+  <div class="stage" id="stage">
+    <!-- The phone is the theme scope. data-theme drives light/dark. -->
+    <div class="phone" id="phone" data-theme="light">
+      <div class="phone__notch" aria-hidden="true"></div>
+
+      <!-- Mock status bar -->
+      <div class="statusbar" id="statusbar" aria-hidden="true">
+        <span class="statusbar__time">9:41</span>
+        <span class="statusbar__icons">
+          <span class="statusbar__signal"></span>
+          <span class="statusbar__wifi"></span>
+          <span class="statusbar__battery"></span>
+        </span>
+      </div>
+
+      <!-- Router mounts screens here -->
+      <main class="viewport" id="viewport" aria-live="polite"></main>
+
+      <!-- Overlay layer for sheets / modals -->
+      <div class="overlay-root" id="overlay-root"></div>
+
+      <!-- Toast layer -->
+      <div class="toast-root" id="toast-root" aria-live="polite" aria-atomic="false"></div>
+
+      <!-- Home indicator -->
+      <div class="home-indicator" aria-hidden="true"></div>
+    </div>
+  </div>
+
+  <script type="module" src="js/app.js"></script>
+</body>
+</html>
