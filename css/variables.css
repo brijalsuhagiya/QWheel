@@ -1,0 +1,185 @@
+/* ============================================================
+   variables.css — design tokens
+   Values extracted from the QuickWheel wireframes.
+   Screens & components must read ONLY from these tokens.
+   ============================================================ */
+
+:root {
+  /* Typeface */
+  --font-sans: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+    Helvetica, Arial, sans-serif;
+
+  /* ---- Radii ---- */
+  --r-xs: 8px;
+  --r-sm: 12px;
+  --r-md: 16px;
+  --r-lg: 20px;
+  --r-xl: 28px;
+  --r-pill: 999px;
+
+  /* ---- Spacing (4pt base) ---- */
+  --s-1: 4px;
+  --s-2: 8px;
+  --s-3: 12px;
+  --s-4: 16px;
+  --s-5: 20px;
+  --s-6: 24px;
+  --s-7: 32px;
+  --s-8: 40px;
+
+  /* ---- Type scale ---- */
+  --fs-micro: 11px;
+  --fs-xs: 12px;
+  --fs-sm: 14px;
+  --fs-md: 15px;
+  --fs-base: 16px;
+  --fs-lg: 18px;
+  --fs-xl: 22px;
+  --fs-2xl: 28px;
+  --fs-3xl: 34px;
+
+  /* ---- Line heights ---- */
+  --lh-tight: 1.15;
+  --lh-snug: 1.3;
+  --lh-base: 1.45;
+
+  /* ---- Motion ---- */
+  --dur-fast: 140ms;
+  --dur-base: 220ms;
+  --dur-slow: 360ms;
+
+  --ease-out: cubic-bezier(0.2, 0.8, 0.2, 1);
+  --ease-in: cubic-bezier(0.4, 0, 1, 1);
+  --ease-std: cubic-bezier(0.4, 0, 0.2, 1);
+
+  /* ---- Phone frame ---- */
+  --phone-w: 390px;
+  --phone-h: 844px;
+  --phone-radius: 46px;
+  --statusbar-h: 48px;
+  --home-indicator-h: 28px;
+
+  /* ---- Fixed brand hues (theme-independent accents) ---- */
+  --brand-blue: #2f6bff;
+  --brand-blue-soft: #e8f0ff;
+  --brand-green: #1a8a4d;
+  --brand-green-ink: #ffffff;
+  --brand-green-text: #13803f;
+  --brand-green-soft: #e3f4e8;
+  --brand-purple: #7b5cff;
+  --brand-purple-soft: #efeafe;
+  --brand-amber: #a9791b;
+  --brand-amber-soft: #f7ecd4;
+  --brand-danger: #e0362f;
+  --brand-danger-soft: #fdeaea;
+  --map-land: #e6e9ee;
+  --map-park: #d8e8cf;
+  --map-road: #ffffff;
+}
+
+/* ============================================================
+   LIGHT THEME  (default) — applied on the .phone scope
+   ============================================================ */
+.phone,
+.phone[data-theme="light"] {
+  color-scheme: light;
+
+  --bg-stage: #e9eaee;          /* area outside the phone */
+  --bg-app: #ffffff;            /* app canvas */
+  --bg-surface: #ffffff;        /* sheets, headers */
+  --bg-card: #f4f4f6;           /* cards, grouped rows */
+  --bg-card-2: #ededf1;         /* nested fill / stepper btn */
+  --bg-pill: #eeeef1;           /* chips, pills */
+
+  --ink: #0a0a0b;               /* primary text */
+  --ink-soft: #6b6c72;          /* secondary text */
+  --ink-mute: #9a9ba2;          /* tertiary / hints */
+  --ink-faint: #c6c7cd;         /* disabled / placeholder */
+
+  --line: #ececef;              /* hairline dividers */
+  --line-strong: #d9dadf;       /* input borders */
+
+  /* Primary action = near-black, as in the wireframes */
+  --accent: #0a0a0b;
+  --accent-ink: #ffffff;
+  --accent-soft: #f1f1f3;
+
+  --success: var(--brand-green);
+  --success-ink: #ffffff;
+  --success-soft: var(--brand-green-soft);
+  --success-text: var(--brand-green-text);
+
+  --info: var(--brand-blue);
+  --info-soft: var(--brand-blue-soft);
+  --safety: var(--brand-purple);
+  --safety-soft: var(--brand-purple-soft);
+  --warn: var(--brand-amber);
+  --warn-soft: var(--brand-amber-soft);
+  --danger: var(--brand-danger);
+  --danger-soft: var(--brand-danger-soft);
+
+  --phone-shell: #0a0a0b;       /* phone body color */
+  --overlay: rgba(0, 0, 0, 0.4);
+  --focus-ring: #2f6bff;
+  --shadow-sheet: 0 -8px 40px rgba(16, 18, 24, 0.14);
+  --shadow-card: 0 2px 10px rgba(16, 18, 24, 0.06);
+  --shadow-pop: 0 10px 30px rgba(16, 18, 24, 0.18);
+
+  --skeleton-1: #ededf1;
+  --skeleton-2: #f6f6f8;
+}
+
+/* ============================================================
+   DARK THEME — accessible counterparts
+   ============================================================ */
+.phone[data-theme="dark"] {
+  color-scheme: dark;
+
+  --bg-stage: #000000;
+  --bg-app: #0e0f12;
+  --bg-surface: #16181d;
+  --bg-card: #1d2026;
+  --bg-card-2: #272b33;
+  --bg-pill: #272b33;
+
+  --ink: #f4f5f7;
+  --ink-soft: #a9abb3;
+  --ink-mute: #787b84;
+  --ink-faint: #54575f;
+
+  --line: #272a31;
+  --line-strong: #363a43;
+
+  /* In dark mode the primary button inverts to light */
+  --accent: #ffffff;
+  --accent-ink: #0a0a0b;
+  --accent-soft: #23262d;
+
+  --success: #35c27a;
+  --success-ink: #05240f;
+  --success-soft: #16351f;
+  --success-text: #4cd38a;
+
+  --info: #5b8cff;
+  --info-soft: #182440;
+  --safety: #9c82ff;
+  --safety-soft: #231d3d;
+  --warn: #e0b25a;
+  --warn-soft: #39300f;
+  --danger: #ff5a52;
+  --danger-soft: #3a1917;
+
+  --phone-shell: #2a2d34;
+  --overlay: rgba(0, 0, 0, 0.6);
+  --focus-ring: #7ea2ff;
+  --shadow-sheet: 0 -8px 40px rgba(0, 0, 0, 0.5);
+  --shadow-card: 0 2px 10px rgba(0, 0, 0, 0.35);
+  --shadow-pop: 0 10px 30px rgba(0, 0, 0, 0.55);
+
+  --map-land: #20242b;
+  --map-park: #22321f;
+  --map-road: #11131a;
+
+  --skeleton-1: #22262e;
+  --skeleton-2: #2c313a;
+}

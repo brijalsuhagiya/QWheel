@@ -1,0 +1,195 @@
+/* ============================================================
+   base.css — body, phone frame, status bar, theme shell
+   ============================================================ */
+
+body {
+  background: var(--bg-stage);
+  color: var(--ink);
+  font-size: var(--fs-base);
+  min-height: 100vh;
+  min-height: 100dvh;
+}
+
+/* Stage centers the phone on wide windows */
+.stage {
+  min-height: 100vh;
+  min-height: 100dvh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--s-6);
+}
+
+/* -------- Phone frame (wide windows) -------- */
+.phone {
+  position: relative;
+  width: var(--phone-w);
+  height: var(--phone-h);
+  max-height: calc(100dvh - var(--s-8));
+  background: var(--bg-app);
+  color: var(--ink);
+  border-radius: var(--phone-radius);
+  box-shadow:
+    0 0 0 11px var(--phone-shell),
+    0 0 0 13px rgba(255, 255, 255, 0.06),
+    0 30px 70px rgba(0, 0, 0, 0.35);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  isolation: isolate;
+}
+
+/* The pill notch */
+.phone__notch {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 150px;
+  height: 28px;
+  background: var(--phone-shell);
+  border-bottom-left-radius: 18px;
+  border-bottom-right-radius: 18px;
+  z-index: 60;
+  pointer-events: none;
+}
+
+/* -------- Mock status bar -------- */
+.statusbar {
+  position: relative;
+  z-index: 55;
+  flex: 0 0 auto;
+  height: var(--statusbar-h);
+  padding: 0 var(--s-6);
+  padding-top: env(safe-area-inset-top);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: var(--fs-sm);
+  font-weight: 600;
+  color: var(--ink);
+  background: transparent;
+  pointer-events: none;
+  transition: color var(--dur-base) var(--ease-std);
+}
+/* On immersive (map/black) screens, the status bar text flips */
+.phone[data-statusbar="light"] .statusbar { color: #ffffff; }
+.phone[data-statusbar="dark"] .statusbar { color: #0a0a0b; }
+
+.statusbar__icons {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+}
+.statusbar__signal,
+.statusbar__wifi,
+.statusbar__battery {
+  display: inline-block;
+  background: currentColor;
+}
+.statusbar__signal {
+  width: 18px; height: 11px;
+  -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 18 11'%3E%3Crect x='0' y='7' width='3' height='4' rx='1'/%3E%3Crect x='5' y='5' width='3' height='6' rx='1'/%3E%3Crect x='10' y='2.5' width='3' height='8.5' rx='1'/%3E%3Crect x='15' y='0' width='3' height='11' rx='1'/%3E%3C/svg%3E") no-repeat center / contain;
+          mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 18 11'%3E%3Crect x='0' y='7' width='3' height='4' rx='1'/%3E%3Crect x='5' y='5' width='3' height='6' rx='1'/%3E%3Crect x='10' y='2.5' width='3' height='8.5' rx='1'/%3E%3Crect x='15' y='0' width='3' height='11' rx='1'/%3E%3C/svg%3E") no-repeat center / contain;
+}
+.statusbar__wifi {
+  width: 15px; height: 11px;
+  background: transparent;
+  border: 1.6px solid currentColor;
+  border-radius: 50%;
+  box-sizing: border-box;
+}
+.statusbar__battery {
+  width: 24px; height: 12px;
+  background: transparent;
+  border: 1.4px solid currentColor;
+  border-radius: 3px;
+  position: relative;
+}
+.statusbar__battery::before {
+  content: "";
+  position: absolute;
+  inset: 2px;
+  right: 3px;
+  background: currentColor;
+  border-radius: 1px;
+}
+.statusbar__battery::after {
+  content: "";
+  position: absolute;
+  right: -3px;
+  top: 3px;
+  width: 2px;
+  height: 6px;
+  background: currentColor;
+  border-radius: 0 1px 1px 0;
+}
+
+/* -------- Viewport: where screens mount -------- */
+.viewport {
+  position: relative;
+  flex: 1 1 auto;
+  overflow: hidden;      /* each screen scrolls internally */
+  background: var(--bg-app);
+}
+
+/* -------- Home indicator -------- */
+.home-indicator {
+  position: absolute;
+  bottom: 8px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 140px;
+  height: 5px;
+  border-radius: var(--r-pill);
+  background: var(--ink);
+  opacity: 0.85;
+  z-index: 58;
+  pointer-events: none;
+}
+.phone[data-statusbar="light"] .home-indicator { background: #fff; opacity: 0.9; }
+
+/* Overlay + toast roots sit above screens */
+.overlay-root,
+.toast-root {
+  position: absolute;
+  inset: 0;
+  z-index: 40;
+  pointer-events: none;
+}
+.toast-root { z-index: 70; }
+
+/* ============================================================
+   RESPONSIVE: below ~520px drop the frame, fill the viewport
+   ============================================================ */
+@media (max-width: 520px) {
+  .stage {
+    padding: 0;
+    align-items: stretch;
+  }
+  .phone {
+    width: 100%;
+    height: 100vh;
+    height: 100dvh;
+    max-height: none;
+    border-radius: 0;
+    box-shadow: none;
+  }
+  .phone__notch { display: none; }
+  .statusbar {
+    height: auto;
+    min-height: 44px;
+    padding-top: max(env(safe-area-inset-top), 10px);
+    padding-bottom: 4px;
+  }
+  .home-indicator {
+    bottom: max(env(safe-area-inset-bottom), 6px);
+  }
+}
+
+/* Very short landscape windows: let the phone shrink gracefully */
+@media (min-width: 521px) and (max-height: 760px) {
+  .phone {
+    height: calc(100dvh - var(--s-6));
+  }
+}
