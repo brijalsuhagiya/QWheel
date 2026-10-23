@@ -1,0 +1,58 @@
+/* ============================================================
+   animations.css — named keyframes + route transition classes
+   ============================================================ */
+
+/* ---- Route transitions ---- */
+/* The router adds an enter class to the incoming screen and an
+   exit class to the outgoing one, then removes both on end. */
+
+.scr-enter-forward { animation: slide-in-right var(--dur-base) var(--ease-out) both; z-index: 2; }
+.scr-exit-forward  { animation: slide-out-left  var(--dur-base) var(--ease-out) both; z-index: 1; }
+.scr-enter-back    { animation: slide-in-left   var(--dur-base) var(--ease-out) both; z-index: 2; }
+.scr-exit-back     { animation: slide-out-right var(--dur-base) var(--ease-out) both; z-index: 1; }
+.scr-enter-fade    { animation: fade-in  var(--dur-base) var(--ease-out) both; z-index: 2; }
+.scr-exit-fade     { animation: fade-out var(--dur-base) var(--ease-out) both; z-index: 1; }
+
+@keyframes slide-in-right { from { transform: translateX(100%); } to { transform: translateX(0); } }
+@keyframes slide-out-left { from { transform: translateX(0); } to { transform: translateX(-24%); opacity: 0.6; } }
+@keyframes slide-in-left { from { transform: translateX(-24%); opacity: 0.6; } to { transform: translateX(0); opacity: 1; } }
+@keyframes slide-out-right { from { transform: translateX(0); } to { transform: translateX(100%); } }
+@keyframes fade-in { from { opacity: 0; transform: scale(0.98); } to { opacity: 1; transform: scale(1); } }
+@keyframes fade-out { from { opacity: 1; } to { opacity: 0; } }
+
+/* ---- Element entrances ---- */
+@keyframes fade-up { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
+@keyframes pop-in { 0% { opacity: 0; transform: scale(0.6); } 60% { transform: scale(1.06); } 100% { opacity: 1; transform: scale(1); } }
+
+/* ---- Component motion ---- */
+@keyframes check-draw { to { stroke-dashoffset: 0; } }
+@keyframes blink { 50% { opacity: 0; } }
+@keyframes spin { to { transform: rotate(360deg); } }
+@keyframes shimmer { from { background-position: 200% 0; } to { background-position: -200% 0; } }
+@keyframes load-bar { from { transform: scaleX(0); } to { transform: scaleX(1); } }
+
+/* Radar ping (finding driver / location) */
+@keyframes radar {
+  0% { transform: scale(0.6); opacity: 0.5; }
+  100% { transform: scale(2.6); opacity: 0; }
+}
+
+/* Pulsing accent dot (running state) */
+@keyframes pulse-dot {
+  0%, 100% { transform: scale(1); opacity: 1; }
+  50% { transform: scale(1.5); opacity: 0.5; }
+}
+.pulse-dot { animation: pulse-dot 1.4s var(--ease-std) infinite; }
+
+/* Toast list stacking handled in JS; entrance via .toast--in transition */
+
+/* Sheet entrance handled via .sheet--in / .sheet-backdrop--in transitions */
+
+/* Reduced motion: everything above is neutralized by reset.css guard,
+   but we also make route transitions instant to avoid a flash. */
+@media (prefers-reduced-motion: reduce) {
+  .scr-enter-forward, .scr-exit-forward,
+  .scr-enter-back, .scr-exit-back,
+  .scr-enter-fade, .scr-exit-fade { animation: none !important; }
+  .scr-exit-forward, .scr-exit-back, .scr-exit-fade { opacity: 0 !important; }
+}
