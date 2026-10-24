@@ -149,3 +149,20 @@ export const MENU_ITEMS = [
   { id: "settings", icon: "settings", title: "Ride preferences", sub: "Walk distance, alerts, theme", soon: false },
   { id: "help", icon: "help", title: "Help & support", sub: "24/7 safety line", soon: true },
 ];
+
+// In-trip progress stages (screen: onTrip). `car` is a [left%, top%]
+// point along the on-trip map route; `pct` fills the trip progress bar.
+export const TRIP_PROGRESS = [
+  { pct: 20, next: "Leaving Gate 2 · Prepaid Auto Stand", sub: "On the NH-48 service road", eta: 12, car: [32, 74] },
+  { pct: 46, next: "Ring Road junction", sub: "Light traffic ahead", eta: 8, car: [48, 52] },
+  { pct: 74, next: "DND Flyway toll", sub: "Smart detour skipped the surge zone", eta: 4, car: [58, 38] },
+  { pct: 92, next: "Sector 24 entry gate", sub: "Almost there", eta: 2, car: [64, 28] },
+];
+
+export const ARRIVAL = { place: "Home", sub: "Sector 24, Noida", durationMin: 31, distanceKm: 18 };
+
+// Feedback screen (screen: arrived)
+export const FEEDBACK_TAGS = [
+  "Safe driving", "On time", "Clean car", "Helped with luggage", "Great conversation", "Smooth detour",
+];
+export const TIP_OPTIONS = [20, 30, 50];

@@ -22,6 +22,8 @@ const routes = {
   confirm: screens.confirm,
   finding: screens.finding,
   arriving: screens.arriving,
+  onTrip: screens.onTrip,
+  arrived: screens.arrived,
 };
 
 const phone = document.getElementById("phone");

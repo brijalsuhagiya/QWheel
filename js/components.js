@@ -534,6 +534,72 @@ export function openSheet(buildContent, { title, labelledBy } = {}) {
   return api;
 }
 
+/* ============================================================
+   Star rating (role=radiogroup of stars) — pointer + keyboard
+   ============================================================ */
+export function starRating({ value = 0, max = 5, onChange, label = "Rating" } = {}) {
+  let v = value;
+  const group = el("div", { class: "stars", role: "radiogroup", attrs: { "aria-label": label } });
+  function paint() {
+    group.querySelectorAll(".star-btn").forEach((b, i) => {
+      const on = i < v;
+      b.classList.toggle("star-btn--on", on);
+      b.setAttribute("aria-checked", String(i + 1 === v));
+      b.setAttribute("tabindex", (i + 1 === (v || 1)) ? "0" : "-1");
+    });
+  }
+  for (let i = 1; i <= max; i++) {
+    const b = el("button", {
+      class: "star-btn", type: "button", role: "radio",
+      attrs: { "aria-label": `${i} star${i > 1 ? "s" : ""}` },
+      html: icon("star", { size: 34 }),
+    });
+    b.addEventListener("click", () => { v = i; paint(); onChange && onChange(v); });
+    b.addEventListener("keydown", (e) => {
+      if (e.key === "ArrowRight" || e.key === "ArrowUp") { e.preventDefault(); v = Math.min(max, (v || 0) + 1); paint(); group.querySelectorAll(".star-btn")[v - 1].focus(); onChange && onChange(v); }
+      if (e.key === "ArrowLeft" || e.key === "ArrowDown") { e.preventDefault(); v = Math.max(1, (v || 1) - 1); paint(); group.querySelectorAll(".star-btn")[v - 1].focus(); onChange && onChange(v); }
+      if (e.key === "Enter" || e.key === " ") { e.preventDefault(); v = i; paint(); onChange && onChange(v); }
+    });
+    group.appendChild(b);
+  }
+  paint();
+  return group;
+}
+
+/* ============================================================
+   Tag group (multi-select, role=group of toggle buttons)
+   ============================================================ */
+export function tagGroup(options, { selected = [], onChange, label } = {}) {
+  const chosen = new Set(selected);
+  const group = el("div", { class: "chip-group", role: "group", attrs: { "aria-label": label } });
+  options.forEach((opt) => {
+    const b = el("button", {
+      class: "chip", type: "button",
+      attrs: { "aria-pressed": String(chosen.has(opt)) },
+      text: opt,
+    });
+    activatable(b, () => {
+      if (chosen.has(opt)) chosen.delete(opt); else chosen.add(opt);
+      b.setAttribute("aria-pressed", String(chosen.has(opt)));
+      onChange && onChange([...chosen]);
+    });
+    group.appendChild(b);
+  });
+  return group;
+}
+
+/* ============================================================
+   Textarea
+   ============================================================ */
+export function textarea({ placeholder = "", label, rows = 3, onInput } = {}) {
+  const ta = el("textarea", {
+    class: "textarea", rows: String(rows), placeholder,
+    attrs: { "aria-label": label || placeholder },
+  });
+  if (onInput) ta.addEventListener("input", () => onInput(ta.value));
+  return ta;
+}
+
 /* Confirm sheet for destructive actions */
 export function confirmSheet({ title, message, confirmLabel = "Confirm", danger = true, onConfirm }) {
   return openSheet((api) => {

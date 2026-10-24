@@ -8,6 +8,7 @@ import {
   badge, pill, chipGroup, toggle, checkbox, stepper, slider,
   row, chevron, option, rideCard, avatar, dots, banner,
   skeleton, toast, openSheet, confirmSheet,
+  starRating, tagGroup, textarea,
 } from "./components.js";
 import * as store from "./store.js";
 import * as D from "./data.js";
@@ -979,7 +980,10 @@ export function arriving(_params, ctx) {
           ]),
         ]),
       ]),
-      button("Cancel ride", { variant: "ghost", onClick: () => cancelSheet() }),
+      el("div", { style: { paddingTop: "4px", display: "flex", flexDirection: "column", gap: "4px" } }, [
+        button("Start ride", { meta: `PIN ${dr.pin}`, onClick: () => ctx.navigate("onTrip") }),
+        button("Cancel ride", { variant: "ghost", onClick: () => cancelSheet() }),
+      ]),
     ]),
   ]);
 
@@ -1008,4 +1012,178 @@ export function arriving(_params, ctx) {
   }
 
   return { node, meta: { statusbar: "default" } };
+}
+
+/* ============================================================
+   16. ON TRIP (live progress — current position, next stop, ETA)
+   ============================================================ */
+export function onTrip(_params, ctx) {
+  const dr = D.DRIVER;
+  const r = rideById(store.get("trip.rideId"));
+  const stages = D.TRIP_PROGRESS;
+  let i = 0;
+  let timer;
+
+  const carMarker = el("div", { class: "car-marker", html: icon("car", { size: 24 }) });
+  const fill = el("div", { class: "trip-progress__fill", style: { width: "0%" } });
+  const nextV = el("div", { class: "next-stop__v" });
+  const nextSub = el("div", { class: "next-stop__sub" });
+  const etaN = el("span", { class: "next-stop__eta-n" });
+  const bigEta = el("div", { class: "trip-eta-big" });
+
+  function paint() {
+    const s = stages[i];
+    fill.style.width = s.pct + "%";
+    carMarker.style.left = s.car[0] + "%";
+    carMarker.style.top = s.car[1] + "%";
+    nextV.textContent = s.next;
+    nextSub.textContent = s.sub;
+    etaN.textContent = String(s.eta);
+    bigEta.innerHTML = `Reaching ${D.ARRIVAL.place} in <span>${s.eta} min</span>`;
+  }
+
+  const node = el("div", { class: "screen--map" }, [
+    mapBackdrop(),
+    el("div", { class: "map-top" }, [iconButton("back", { label: "Back to home", onClick: () => ctx.reset("home") })]),
+    el("div", { html: `<svg class="map-route" viewBox="0 0 100 100" preserveAspectRatio="none"><polyline class="solid" points="30,80 42,62 50,50 58,40 66,26"/></svg>` }).firstElementChild,
+    el("div", { style: { position: "absolute", left: "66%", top: "26%", width: "16px", height: "16px", background: "var(--accent)", border: "3px solid #fff", borderRadius: "50%", transform: "translate(-50%,-50%)" } }),
+    carMarker,
+    el("div", { class: "dock" }, [
+      el("div", { class: "dock__grip" }),
+      el("div", { class: "eta-row" }, [
+        el("div", { class: "eta-row__title", text: `Heading to ${D.ARRIVAL.place}` }),
+        el("div", { class: "pin-chip" }, [el("span", { html: icon("record", { size: 13 }) }), el("span", { text: " Live" })]),
+      ]),
+      el("div", { class: "dock__scroll" }, [
+        el("div", { class: "trip-progress" }, [
+          el("div", { class: "trip-progress__track" }, [fill]),
+          el("div", { class: "trip-progress__ends" }, [
+            el("span", { text: pickupById(store.get("trip.pickupId")).badge === "A" ? "Gate 2" : "Pickup" }),
+            el("span", { text: D.ARRIVAL.place }),
+          ]),
+        ]),
+        el("div", { class: "next-stop" }, [
+          el("div", { class: "next-stop__icon", html: icon("location", { size: 20 }) }),
+          el("div", { class: "next-stop__body" }, [
+            el("div", { class: "next-stop__k", text: "Next stop" }),
+            nextV, nextSub,
+          ]),
+          el("div", { class: "next-stop__eta" }, [etaN, el("div", { class: "next-stop__eta-u", text: "min" })]),
+        ]),
+        bigEta,
+        el("div", { class: "divider" }),
+        el("div", { class: "driver", style: { background: "var(--bg-card)" } }, [
+          avatar(dr.initial, { color: "var(--accent)", cls: "avatar--dark" }),
+          el("div", { class: "driver__body" }, [
+            el("div", { class: "driver__name" }, [el("span", { text: dr.name }), el("span", { class: "star" }, [el("span", { html: icon("star", { size: 14 }) }), el("span", { text: String(dr.rating) })])]),
+            el("div", { class: "driver__car", text: `${dr.car} · ${dr.plate}` }),
+          ]),
+          iconButton("phone", { label: "Call driver", onClick: () => toast("Calling the driver… (demo)", {}) }),
+        ]),
+        el("div", { class: "safety-strip", style: { marginTop: "14px" } }, [
+          el("div", { class: "safety-strip__icon", html: icon("checkThin", { size: 13 }) }),
+          el("div", { class: "safety-strip__body" }, [
+            el("div", { class: "safety-strip__title", text: "Safety active" }),
+            el("div", { class: "safety-strip__sub", text: "Recording on · location shared with Mom, Priya" }),
+          ]),
+        ]),
+      ]),
+      el("div", { style: { paddingTop: "4px" } }, [button("Share live trip", { variant: "secondary", onClick: () => toast("Live trip link copied to clipboard (demo).", { kind: "success", icon: "check" }) })]),
+    ]),
+  ]);
+
+  return {
+    node, meta: { statusbar: "default" },
+    onEnter() {
+      paint();
+      const step = () => {
+        if (i < stages.length - 1) { i++; paint(); timer = setTimeout(step, 1900); }
+        else { timer = setTimeout(() => ctx.replace("arrived"), 1700); }
+      };
+      timer = setTimeout(step, 1900);
+    },
+    onExit() { clearTimeout(timer); },
+  };
+}
+
+/* ============================================================
+   17. ARRIVED — reached destination + feedback
+   ============================================================ */
+export function arrived(_params, ctx) {
+  const dr = D.DRIVER;
+  const r = rideById(store.get("trip.rideId"));
+  const shared = store.get("trip.shared");
+  const coupon = store.get("trip.coupon");
+
+  let rating = 0;
+  let tags = [];
+  let tip = 0;
+  let note = "";
+
+  const errLive = el("div", { class: "form-error", attrs: { "aria-live": "polite" }, style: { textAlign: "center" } });
+
+  const stars = starRating({ value: 0, label: "Rate your driver", onChange: (v) => { rating = v; errLive.textContent = ""; } });
+
+  const tipGroup = chipGroup(
+    [...D.TIP_OPTIONS.map((t) => ({ value: t, label: `₹${t}` })), { value: 0, label: "No tip" }],
+    { value: 0, label: "Add a tip", onChange: (v) => { tip = v; } }
+  );
+
+  const tagsGroup = tagGroup(D.FEEDBACK_TAGS, { label: "What went well", onChange: (t) => { tags = t; } });
+
+  function submit() {
+    if (rating === 0) {
+      errLive.textContent = "Tap a star to rate your ride first.";
+      stars.querySelector(".star-btn") && stars.querySelector(".star-btn").focus();
+      return;
+    }
+    store.update("trip", { rating, tip });
+    const extra = tip ? ` ₹${tip} tip sent to ${dr.name}.` : "";
+    toast(`Thanks for riding with ${D.BRAND.name}!${extra}`, { kind: "success", icon: "check", duration: 3000 });
+    ctx.reset("home");
+  }
+
+  const node = el("div", {}, [
+    el("div", { class: "arrived__scroll" }, [
+      el("div", { class: "arrived__hero" }, [
+        el("div", { class: "arrived__check", html: icon("check", { size: 38, stroke: 2.6 }) }),
+        el("h1", { class: "arrived__title", text: `You've reached ${D.ARRIVAL.place}` }),
+        el("div", { class: "arrived__sub", text: D.ARRIVAL.sub }),
+        el("div", { class: "arrived__meta", text: `Trip completed · ${D.ARRIVAL.distanceKm} km · ${D.ARRIVAL.durationMin} min` }),
+      ]),
+
+      el("div", { class: "summary" }, [
+        el("div", { class: "summary-row" }, [el("span", { class: "summary-row__k", text: `${r.name} fare` }), el("span", { class: "summary-row__v", text: `₹${r.price}` })]),
+        shared ? el("div", { class: "summary-row" }, [el("span", { class: "summary-row__k", text: "Shared-ride saving" }), el("span", { class: "summary-row__v text-success", text: `−₹${D.RIDE_OPTIONS.find((o) => o.id === "shared").save}` })]) : null,
+        coupon ? el("div", { class: "summary-row" }, [el("span", { class: "summary-row__k", text: `Coupon ${coupon}` }), el("span", { class: "summary-row__v text-success", text: "applied" })]) : null,
+        el("div", { class: "summary-row" }, [el("span", { class: "summary-row__k", text: `Paid · ${D.PAYMENT.method}` }), el("span", { class: "summary-row__v", text: "Success" })]),
+        el("div", { class: "summary-row summary-row--total" }, [el("span", { class: "summary-row__k", text: "Total paid" }), el("span", { class: "summary-row__v", text: `₹${r.price}` })]),
+      ]),
+
+      el("div", { class: "section-label", text: "Rate your ride" }),
+      el("div", { class: "card", style: { background: "var(--bg-card)" } }, [
+        el("div", { class: "rate-driver" }, [
+          avatar(dr.initial, { size: "lg", color: "var(--accent)", cls: "avatar--dark" }),
+          el("div", { class: "rate-driver__q", text: `How was your trip with ${dr.name}?` }),
+          stars,
+          errLive,
+        ]),
+      ]),
+
+      el("div", { class: "section-label", text: "What went well" }),
+      tagsGroup,
+
+      el("div", { class: "section-label", text: `Add a tip for ${dr.name}` }),
+      tipGroup,
+
+      el("div", { class: "section-label", text: "Anything else?" }),
+      textarea({ placeholder: "Share feedback for QuickWheel (optional)", label: "Trip feedback", onInput: (v) => { note = v; } }),
+    ]),
+    actionBar([
+      button("Submit feedback", { onClick: submit }),
+      button("Skip", { variant: "ghost", onClick: () => ctx.reset("home") }),
+    ]),
+  ]);
+
+  return { node, meta: { statusbar: "dark" } };
 }
