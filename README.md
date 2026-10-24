@@ -57,8 +57,8 @@ Why it "just works" on Pages:
 
 ## What's built
 
-A complete first-run → booking → ride flow, 15 screens, reconciled from the
-17 wireframes and the brief's target journey (sections 10.2 & 11):
+A complete first-run → booking → ride → arrival flow, 17 screens, reconciled
+from the 17 wireframes and the brief's target journey (sections 10.2 & 11):
 
 | # | Screen | Route | Notes |
 |---|--------|-------|-------|
@@ -76,18 +76,24 @@ A complete first-run → booking → ride flow, 15 screens, reconciled from the
 | 12 | Smart detour | `detour` | Cheaper-route offer (skips toll & surge). |
 | 13 | Confirm your ride | `confirm` | Fare breakdown, coupon `FIRST50`, confirm. |
 | 14 | Finding your ride | `finding` | Radar match; auto-advances to driver. |
-| 15 | Driver arriving | `arriving` | Driver card, PIN, call/message/share-trip. |
+| 15 | Driver arriving | `arriving` | Driver card, PIN, call/message/share-trip; **Start ride** begins the trip. |
+| 16 | On trip | `onTrip` | Live progress bar, next stop, counting-down ETA; car moves on the map, then auto-arrives. |
+| 17 | Reached + feedback | `arrived` | "You've reached", fare summary, star rating, what-went-well tags, optional tip & note. |
 
 **Flow wiring:** `splash → onboarding → phone → otp → photo → home → pickup →
-tripDetails → rideOptions → confirm → detour → finding → arriving`.
-`safety` opens from the ride-options safety banner; `shareRide` opens when the
-**Shared** option is selected (its CTA becomes "Set up shared ride").
+tripDetails → rideOptions → confirm → detour → finding → arriving → onTrip →
+arrived → (home)`. `safety` opens from the ride-options safety banner;
+`shareRide` opens when the **Shared** option is selected (its CTA becomes "Set
+up shared ride"). `arriving` → **Start ride** → `onTrip` steps through the
+journey stages and auto-advances to `arrived`; submitting (or skipping)
+feedback returns to `home`.
 
-Every screen handles its states: empty/required (photo gate), **loading**
-(ride-options skeleton, finding spinner), **validation** (phone & OTP inline
-errors in an `aria-live` region), **destructive actions** behind confirm
-sheets (cancel search, cancel ride, SOS, reset demo), and **storage
-disabled** (silent in-memory fallback + a one-time heads-up toast).
+Every screen handles its states: empty/required (photo gate, "rate before you
+submit" on feedback), **loading** (ride-options skeleton, finding spinner,
+live trip progress), **validation** (phone, OTP & rating inline errors in an
+`aria-live` region), **destructive actions** behind confirm sheets (cancel
+search, cancel ride, SOS, reset demo), and **storage disabled** (silent
+in-memory fallback + a one-time heads-up toast).
 
 **Interactions & feel:** route transitions (slide-in-right forward,
 slide-in-left back, fade for replace, ~220ms), `:active` tile/button scale,
@@ -97,10 +103,11 @@ focus-trapped). `prefers-reduced-motion: reduce` collapses all of it.
 
 **Accessibility:** semantic `<main>`/`<header>`/`<nav>`, `role="switch"`
 (toggles), `role="checkbox"`, `role="radiogroup"/"radio"` (chips, pickup
-points, ride cards), `role="slider"` with `aria-valuemin/max/now/valuetext`,
-`role="dialog" aria-modal="true"` sheets, `aria-live="polite"` toast/error
-region, ≥44×44px touch targets, visible focus rings, and AA-contrast color
-pairs in **both light and dark** themes.
+points, ride cards), `role="slider"` with `aria-valuemin/max/now/valuetext`, a keyboard-navigable
+`role="radiogroup"` **star rating**, multi-select feedback tags
+(`aria-pressed`), `role="dialog" aria-modal="true"` sheets, `aria-live="polite"`
+toast/error region, ≥44×44px touch targets, visible focus rings, and
+AA-contrast color pairs in **both light and dark** themes.
 
 **Theme:** light-first (matches the wireframes). A full dark theme ships on
 `.phone[data-theme="dark"]` and is switchable from **Menu → Ride preferences
@@ -117,6 +124,12 @@ distance, cheaper-route alerts, dark theme), and **Reset demo**. The
 **Smart detour** screen (wireframe 14) isn't pinned to a fixed spot in the
 flow; it's placed right after booking confirmation as a "cheaper route found
 before dispatch" moment.
+
+The **On trip** (`onTrip`) and **Reached + feedback** (`arrived`) screens
+extend the journey past the last wireframe (driver arriving), covering the
+brief's target-journey Step 5 "ride with support" and Step 6 "arrive, pay,
+rate" (§10.2). `onTrip` simulates movement by stepping through a few progress
+stages (position, next stop, ETA) before auto-arriving.
 
 ## Marked WIP / out of scope
 
@@ -210,7 +223,7 @@ code changes.
 
 - `python3 -m http.server` → every screen reachable, every interaction works,
   **no console errors or 404s** (verified via a headless click-through of all
-  15 routes).
+  17 routes).
 - Relative, leading-slash-free paths → identical render at a Pages sub-path or
   user-root; every CSS/JS/font request returns 200.
 - Resizing between a phone viewport and a wide desktop reflows cleanly: the app
