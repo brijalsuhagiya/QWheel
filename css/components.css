@@ -174,11 +174,40 @@
   transition: background var(--dur-fast), color var(--dur-fast), border-color var(--dur-fast), transform var(--dur-fast) var(--ease-out);
 }
 .chip:active { transform: scale(0.96); }
-.chip[aria-checked="true"] {
+.chip[aria-checked="true"],
+.chip[aria-pressed="true"] {
   background: var(--accent);
   color: var(--accent-ink);
   border-color: var(--accent);
 }
+
+/* ---------------- Star rating ---------------- */
+.stars { display: flex; gap: var(--s-2); }
+.star-btn {
+  color: var(--line-strong);
+  transition: transform var(--dur-fast) var(--ease-out), color var(--dur-fast);
+}
+.star-btn:active { transform: scale(0.88); }
+.star-btn--on { color: #f0a500; }
+.star-btn svg { width: 34px; height: 34px; }
+
+/* ---------------- Textarea ---------------- */
+.textarea {
+  width: 100%;
+  min-height: 92px;
+  padding: var(--s-4);
+  border-radius: var(--r-md);
+  background: var(--bg-card);
+  border: 1.5px solid transparent;
+  font-size: var(--fs-base);
+  font-weight: 500;
+  color: var(--ink);
+  resize: none;
+  font-family: inherit;
+  line-height: var(--lh-base);
+}
+.textarea::placeholder { color: var(--ink-faint); }
+.textarea:focus { outline: none; border-color: var(--accent); background: var(--bg-surface); }
 
 /* ---------------- Cards & surfaces ---------------- */
 .card {
